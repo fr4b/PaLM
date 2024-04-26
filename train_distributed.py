@@ -382,7 +382,7 @@ def build_dataloaders():
         Dataset: The processed dataset ready for training.
     """
     tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
-    dataset = load_dataset("openwebtext", split="train")
+    dataset = load_dataset("EleutherAI/pile", split="train")
 
     tokenized_dataset = dataset.map(
         lambda example: tokenizer([t + tokenizer.eos_token for t in example["text"]]),
@@ -459,7 +459,7 @@ def main():
 
     # instantiate palm
 
-    # 1B
+    # 2.7B
     model = PaLM(
         num_tokens=50304,
         dim=2560,
