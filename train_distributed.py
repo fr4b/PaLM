@@ -43,9 +43,9 @@ class CFG:
     WEIGHT_DECAY: float = 0.1
     SEQ_LEN: int = 8192
     NUM_CPU: int = multiprocessing.cpu_count()
-    USE_DEEPSPEED: bool = True
+    USE_DEEPSPEED: bool = False
     USE_FSDP: bool = False
-    USE_PRETOKENIZED: bool = True
+    USE_PRETOKENIZED: bool = False
     USE_ACTIVATION_CHECKPOINTING: bool = False
     RESUME_FROM_CHECKPOINT: str = "/step_55800"
     CHECKPOINTING_STEPS: int = 100
@@ -437,7 +437,6 @@ def main():
     accelerator = Accelerator(
         gradient_accumulation_steps=CFG.GRADIENT_ACCUMULATE_EVERY,
         mixed_precision="bf16",
-        log_with="wandb",
         kwargs_handlers=[timeout],
     )
 
@@ -465,8 +464,8 @@ def main():
         num_tokens=50304,
         dim=2560,
         depth=32,
-        dim_head=128,
-        heads=24,
+        dim_head=80,
+        heads=32,
         flash_attn=True,
     )
 
@@ -608,12 +607,12 @@ def main():
 
     # end training
 
-    # accelerator.print(f"Training Finished")
+    accelerator.print(f"Training Finished")
     accelerator.end_training()
 
     # save final model
 
-    # accelerator.print(f"Saving model to {CFG.OUTPUT_DIR}")
+    accelerator.print(f"Saving model to {CFG.OUTPUT_DIR}")
     if CFG.OUTPUT_DIR is not None:
         accelerator.wait_for_everyone()
         unwrapped_model = accelerator.unwrap_model(model)
